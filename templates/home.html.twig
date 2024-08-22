@@ -1,0 +1,37 @@
+{% extends "base.html.twig" %}
+
+{% block content %}
+	<div class="page-header">
+		<div class="row py-lg-5">
+			<div class="col-lg-6 col-md-8 mx-auto">
+				<h1 class="fw-light">Electrónica Don Pepe</h1>
+				<p class="lead text-muted">Trabajo Práctico final de la materia Programacion Avanzada II, UTN FRGP, 2do Cuatrimestre 2013</p>
+			</div>
+		</div>
+		<h2>Elija la accion a realizar</h2><br>
+		<b>Ventas</b>
+		<ul>
+			<li>
+				<a href="{{ url('app_sale_new') }}">Alta</a>
+			</li>
+			<li>
+				<a href="{{ url('app_sale_index') }}">Consulta</a>
+			</li>
+		</ul>
+		<b>Comisiones y Premios</b>
+		<ul>
+			<li>
+				<a href="">Obtener reporte</a>
+			</li>
+			<li>
+				<a href="">Administrar campanias</a>
+			</li>
+			<li>
+				<a href="">Actualizar Montos</a>
+			</li>
+		</ul>
+		{% if user is defined %}
+			<a href="">Administrar usuarios</a>
+		{% endif %}
+	</div>
+{% endblock %}

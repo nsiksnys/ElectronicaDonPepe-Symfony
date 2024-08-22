@@ -1,0 +1,9 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+	<h1>Registrar una venta</h1>
+
+	{{ include('sale/_form.html.twig') }}
+
+	<br><a href="{{ path('app_sale_index') }}">Ir a lista de ventas</a>
+{% endblock %}

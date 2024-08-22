@@ -1,0 +1,36 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+    <h1>Ventas</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Nro</th>
+                <th scope="col">Fecha</th>
+                <th scope="col">Importe</th>
+                <th scope="col">Vendedor</th>
+                <th scope="col">Detalles</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for sale in sales %}
+            <tr>
+                <td>{{ sale.id }}</td>
+                <td>{{ sale.salesDate ? sale.salesDate|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ sale.salesman.getFullName }}</td>
+                <td>{{ sale.total }}</td>
+                <td>
+                    <a href="{{ path('app_sale_show', {'id': sale.id}) }}">Ver</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="4">No existen resultados</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_sale_new') }}">Registrar nueva venta</a>
+{% endblock %}
