@@ -16,6 +16,18 @@ class ProductRepository extends ServiceEntityRepository
         parent::__construct($registry, Product::class);
     }
 
+    public function findProductsInNoCommission(): array
+    {
+        $qb = $this->createQueryBuilder('p');
+
+        $subquery = $this->getEntityManager()->getConnection()->executeQuery("SELECT DISTINCT product_id FROM product_commission_amount")->fetchAllAssociative();
+        return $this->createQueryBuilder('p')
+                ->where($qb->expr()->notIn('p.id', ':subquery'))
+                ->setParameter('subquery', $subquery)
+                ->getQuery()
+                ->getResult();
+    }
+
     //    /**
     //     * @return Product[] Returns an array of Product objects
     //     */
