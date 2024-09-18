@@ -35,7 +35,7 @@ class Bonus
     /**
      * @var Collection<int, ProductCommission>
      */
-    #[ORM\ManyToMany(targetEntity: ProductCommission::class)]
+    #[ORM\ManyToMany(targetEntity: ProductCommission::class, cascade: ['persist', 'remove'])]
     private Collection $ProductComissions;
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
@@ -44,7 +44,7 @@ class Bonus
     /**
      * @var Collection<int, Award>
      */
-    #[ORM\ManyToMany(targetEntity: Award::class)]
+    #[ORM\ManyToMany(targetEntity: Award::class, cascade: ['persist', 'remove'])]
     private Collection $campaigns;
 
     #[ORM\Column(nullable: true)]

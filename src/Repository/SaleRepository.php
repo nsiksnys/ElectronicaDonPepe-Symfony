@@ -16,6 +16,35 @@ class SaleRepository extends ServiceEntityRepository
         parent::__construct($registry, Sale::class);
     }
 
+    /**
+     * @param \App\Entity\Salesman $salesman a Salesman object
+     * @param string $from the beginning of the search window
+     * @param string $to the end of the search window
+     * @return Sale[] Returns an array of Sale objects
+    */
+    public function findBySalesmanAndDates(\App\Entity\Salesman $salesman, string $from, string $to) : array
+    {
+        return $this->createQueryBuilder('s')
+                    ->where($this->getEntityManager()->createQueryBuilder()->expr()->between('s.salesDate', ':from', ':to'))
+                    ->andWhere('s.salesman = :salesman')
+                    ->setParameter('salesman', $salesman)
+                    ->setParameter('from', $from)
+                    ->setParameter('to', $to)
+                    ->getQuery()
+                    ->getResult();
+    }
+
+    public function countByDates(string $from, string $to) : int
+    {
+        return $this->createQueryBuilder('s')
+                    ->select('COUNT(s.id)')
+                    ->where($this->getEntityManager()->createQueryBuilder()->expr()->between('s.salesDate', ':from', ':to'))
+                    ->setParameter('from', $from)
+                    ->setParameter('to', $to)
+                    ->getQuery()
+                    ->getSingleScalarResult();
+    }
+
     //    /**
     //     * @return Sale[] Returns an array of Sale objects
     //     */

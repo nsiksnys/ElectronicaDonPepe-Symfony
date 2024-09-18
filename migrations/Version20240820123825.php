@@ -23,7 +23,7 @@ final class Version20240820123825 extends AbstractMigration
         $this->addSql('CREATE TABLE award (
           id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
           awarded_to_id INTEGER NOT NULL,
-          product_id INTEGER NOT NULL,
+          product_id INTEGER DEFAULT NULL,
           created_at DATETIME NOT NULL,
           date_from DATETIME NOT NULL,
           date_to DATETIME NOT NULL,
