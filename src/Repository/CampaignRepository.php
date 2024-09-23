@@ -16,6 +16,11 @@ class CampaignRepository extends ServiceEntityRepository
         parent::__construct($registry, Campaign::class);
     }
 
+    public function getSelectDistinctQuery()
+    {
+        return $this->createQueryBuilder('c')->select(['c.id'])->distinct()->getQuery()->getSQL();
+    }
+
     //    /**
     //     * @return Campaign[] Returns an array of Campaign objects
     //     */

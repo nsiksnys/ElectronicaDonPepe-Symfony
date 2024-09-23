@@ -16,16 +16,35 @@ class ProductRepository extends ServiceEntityRepository
         parent::__construct($registry, Product::class);
     }
 
-    public function findProductsInNoCommission(): array
+    public function findProductsInNoCommission(string $subquery): array
     {
         $qb = $this->createQueryBuilder('p');
 
-        $subquery = $this->getEntityManager()->getConnection()->executeQuery("SELECT DISTINCT product_id FROM product_commission_amount")->fetchAllAssociative();
+        $productIds = $this->getSubqueryResults($subquery);
+        
         return $this->createQueryBuilder('p')
                 ->where($qb->expr()->notIn('p.id', ':subquery'))
-                ->setParameter('subquery', $subquery)
+                ->setParameter('subquery', $productIds)
                 ->getQuery()
                 ->getResult();
+    }
+
+    public function findProductsInNoCampaign(string $subquery): array
+    {
+        $qb = $this->getEntityManager()->createQueryBuilder();
+
+        $productIds = $this->getSubqueryResults($subquery);
+        
+        return $this->createQueryBuilder('p')
+                ->where($qb->expr()->notIn('p.id', ':subquery'))
+                ->setParameter('subquery', $productIds)
+                ->getQuery()
+                ->getResult();
+    }
+
+    private function getSubqueryResults(string $subquery)
+    {
+        return $this->getEntityManager()->getConnection()->executeQuery($subquery)->fetchAllAssociative();
     }
 
     //    /**
