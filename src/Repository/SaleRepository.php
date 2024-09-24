@@ -45,6 +45,16 @@ class SaleRepository extends ServiceEntityRepository
                     ->getSingleScalarResult();
     }
 
+    public function findByDates(string $from, string $to) : array
+    {
+        return $this->createQueryBuilder('s')
+                    ->where($this->getEntityManager()->createQueryBuilder()->expr()->between('s.salesDate', ':from', ':to'))
+                    ->setParameter('from', $from)
+                    ->setParameter('to', $to)
+                    ->getQuery()
+                    ->getResult();
+    }
+
     //    /**
     //     * @return Sale[] Returns an array of Sale objects
     //     */

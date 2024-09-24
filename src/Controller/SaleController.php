@@ -11,7 +11,9 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -19,11 +21,41 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/sale')]
 class SaleController extends AbstractController
 {
-    #[Route('/', name: 'app_sale_index', methods: ['GET'])]
-    public function index(SaleRepository $saleRepository): Response
+
+    #[Route('/', name: 'app_sale_index', methods: ['GET','POST'])]
+    public function index(Request $request, SaleRepository $saleRepository): Response
     {
+        $sales = $saleRepository->findAll();
+
+        $form = $this->createFormBuilder()
+                     ->add('date_from', DateType::class, [
+                        'label' => 'Desde',
+                        'widget' => 'single_text',
+                        'input' => 'string',
+                        'label_attr' => [ 'class' => 'form-label'],
+                        'attr' => [ 'class' => 'form-control']
+                     ])
+                     ->add('date_to', DateType::class, [
+                        'label' => 'Hasta',
+                        'widget' => 'single_text',
+                        'input' => 'string',
+                        'label_attr' => [ 'class' => 'form-label'],
+                        'attr' => [ 'class' => 'form-control']
+                     ])
+                     ->add('search', SubmitType::class, [
+                        'label' => 'Buscar', 
+                        'attr' => [ 'class' => 'btn btn-primary']
+                     ])
+                     ->getForm();
+        
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $formData = $form->getData();
+            $sales = $saleRepository->findByDates($formData['date_from'], $formData['date_to']);
+        }
         return $this->render('sale/index.html.twig', [
-            'sales' => $saleRepository->findAll(),
+            'form' => $form,
+            'sales' => $sales
         ]);
     }
 
@@ -59,7 +91,7 @@ class SaleController extends AbstractController
                     ])
                     ->add('save', SubmitType::class, [
                         'label' => 'Guardar', 
-                        'attr' => [ 'class' => 'btn-primary']
+                        'attr' => [ 'class' => 'btn btn-primary']
                     ])
                     ->getForm();
         
@@ -80,11 +112,11 @@ class SaleController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_sale_show', methods: ['GET'])]
-    public function show(Sale $sale): Response
+    public function show(Sale $sale): JsonResponse
     {
-        return $this->render('sale/show.html.twig', [
+        return $this->json(['html' => $this->render('sale/show.html.twig', [
             'sale' => $sale,
-        ]);
+        ])->getContent()]);
     }
 
     private function calculateTotal(Sale $sale): float

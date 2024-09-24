@@ -1,38 +1,23 @@
-{% extends 'base.html.twig' %}
-
-{% block content %}
-	<h1>Sale {{ sale.id }}</h1><br>
-    <h3><b>Created:</b> {{ sale.salesDate ? sale.salesDate|date('Y-m-d H:i:s') : '' }}</h3>
-    <h3><b>Salesman:</b> {{ sale.salesman.getFullName }}</h3><br>
-
-	<h2>Products list</h2>
-	<table class="table">
-		<thead>
-			<tr>
-				<td scope="col">
-					Id
-				</td>
-				<td scope="col">
-					<center>Name</center>
-				</td>
-				<td scope="col">
-					Unit price
-				</td>
-			</tr>
-		</thead>
-		<tbody>
-            {% for product in sale.products %}
-			<tr>
-				<td>{{ product.id }}</td>
-				<td>{{ product.name }}</td>
-				<td>{{ product.unitPrice }}</td>
-			</tr>
-            {% endfor %}
-		</tbody>
-	</table>
-	<h3>Total:
-		{{ sale.total }}</h3>
-
-	<a href="{{ path('app_sale_index') }}">back to list</a>
-
-{% endblock %}
+<b>Created:</b> {{ sale.salesDate ? sale.salesDate|date('Y-m-d H:i:s') : '' }} <br>
+<b>Salesman:</b> {{ sale.salesman.getFullName }} <br>
+<br>
+<b>Products list</b>
+<table class="table">
+	<thead>
+		<tr>
+			<td scope="col">Id</td>
+			<td scope="col"><center>Name</center></td>
+			<td scope="col">Unit price</td>
+		</tr>
+	</thead>
+	<tbody>
+           {% for product in sale.products %}
+		<tr>
+			<td>{{ product.id }}</td>
+			<td>{{ product.name }}</td>
+			<td>{{ product.unitPrice }}</td>
+		</tr>
+           {% endfor %}
+	</tbody>
+</table>
+<b>Total: {{ sale.total }}</b>

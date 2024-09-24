@@ -2,14 +2,27 @@
 
 {% block content %}
     <h1>Ventas</h1>
+    <!-- search form -->
+    {{ form_start(form) }}
+        <div class="mb-4">
+            {{ form_row(form.date_from)}}
+        </div>
+        <div class="mb-4">
+            {{ form_row(form.date_to)}}
+        </div>
+        <div class="mb-4">
+            {{ form_row(form.search) }}
+        </div>
+        {{ form_rest(form) }}
+    {{ form_end(form)}}
 
     <table class="table">
         <thead>
             <tr>
                 <th scope="col">Nro</th>
                 <th scope="col">Fecha</th>
-                <th scope="col">Importe</th>
                 <th scope="col">Vendedor</th>
+                <th scope="col">Importe</th>
                 <th scope="col">Detalles</th>
             </tr>
         </thead>
@@ -21,7 +34,8 @@
                 <td>{{ sale.salesman.getFullName }}</td>
                 <td>{{ sale.total }}</td>
                 <td>
-                    <a href="{{ path('app_sale_show', {'id': sale.id}) }}">Ver</a>
+                    <!-- <a href="{{ path('app_sale_show', {'id': sale.id}) }}">Ver</a> -->
+                    <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#showSaleModal" data-bs-sale="{{ sale.id }}">Ver</button>
                 </td>
             </tr>
         {% else %}
@@ -33,4 +47,38 @@
     </table>
 
     <a href="{{ path('app_sale_new') }}">Registrar nueva venta</a>
+    
+    {{ include('modal.html.twig', { name: 'showSale', title: 'Sale details' }) }}
+    <script type="application/javascript">
+		// Get sale details
+		var showSaleModal = document.getElementById('showSaleModal');
+		showSaleModal.addEventListener('show.bs.modal', function (event) {
+			var button = event.relatedTarget;
+			var id = button.getAttribute('data-bs-sale');
+			var url = "{{ url('app_sale_show', { id: 'id' }) }}".replace('id', id);
+
+			// Ajax call to get html
+			var request = new XMLHttpRequest();
+			request.open("GET", url);
+			request.send();
+			request.onreadystatechange = function() {
+				if (request.readyState == XMLHttpRequest.DONE) {
+					// Check the status of the response
+					if (request.status == 200) {
+					// Access the data returned by the server
+					var data = JSON.parse(request.responseText);
+					showSaleModal.querySelector('.modal-body').innerHTML = data.html;
+					// Do something with the data
+					} else {
+					// Handle error
+					console.log("Error ${error}");
+					}
+				}
+			};
+		});
+
+		showSaleModal.addEventListener('hide.bs.modal', function (event) {
+			showSaleModal.querySelector('.modal-body').innerHTML = "";
+		});
+    </script>
 {% endblock %}
