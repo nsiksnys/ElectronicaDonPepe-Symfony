@@ -121,8 +121,8 @@ class BonusCalculations
         $bonus->setBestSalesmanMonth($thisBestSalesman);
         $this->setTotals($bonus);
 
-        $this->entityManager->persist($bonus);
-        $this->entityManager->flush();
+        // $this->entityManager->persist($bonus);
+        // $this->entityManager->flush();
 
         return $bonus;
     }
@@ -343,5 +343,88 @@ class BonusCalculations
             $subtotals['total'] += $bonus->getBestSalesmanMonth()->getTotal();
 
         return $subtotals;
+    }
+
+    public function updateAllExistingBonus(float $newAmountValue, float $oldAmountValue, string $type, bool $isCampaign = null) : int
+    {
+        $updatedCounter = 0;
+        
+        switch($type)
+        {
+            case "product":
+                $updatedCounter = $this->updatedExistingProductCommission($newAmountValue, $oldAmountValue);
+                break;
+            case "sale":
+                $updatedCounter = $this->updateExistingSaleCommission($newAmountValue, $oldAmountValue);
+                break;
+            case "award":
+                $updatedCounter = $this->updateExistingAwards($newAmountValue, $oldAmountValue, $isCampaign);
+                break;
+        }
+
+        $bonuses = $this->bonusRepository->findAll();
+
+        foreach($bonuses as $bonus)
+        {
+            $oldBonus = $bonus;
+            $this->setTotals($bonus);
+            if ($bonus->getTotal() != $oldBonus->getTotal()){
+                $this->entityManager->flush();
+                $updatedCounter++;
+            }
+        }
+        return $updatedCounter;
+    }
+
+
+    public function updateExistingAwards(float $newAmountValue, float $oldAmountValue, bool $isCampaign): int
+    {
+        $existingAwards = $this->awardRepository->findBy(['campaign' => $isCampaign]);
+        $updatedCounter = 0;
+
+        foreach ($existingAwards as $award)
+        {
+            if ($award->getTotal() == $oldAmountValue) {
+                $award->setTotal($newAmountValue);
+                $this->entityManager->flush();
+                $updatedCounter++;
+            }
+        }
+
+        return $updatedCounter;
+    }
+
+    public function updatedExistingProductCommission(float $newAmountValue, float $oldAmountValue): int
+    {
+        $existingProductCommissions = $this->productCommissionRepository->findAll();
+        $updatedCounter = 0;
+
+        foreach ($existingProductCommissions as $commission)
+        {
+            if (($commission->getTotal() / $commission->getUnits()) == $oldAmountValue) {
+                $commission->setTotal($commission->getUnits() * $newAmountValue);
+                $this->entityManager->flush();
+                $updatedCounter++;
+            }
+        }
+
+        return $updatedCounter;
+    }
+
+    public function updateExistingSaleCommission(float $newAmountValue, float $oldAmountValue): int
+    {
+        $existingSaleCommissions = $this->saleCommissionRepository->findAll();
+        $updatedCounter = 0;
+
+        foreach ($existingSaleCommissions as $commission)
+        {
+            if ($commission->getTotal() == $oldAmountValue) {
+                $commission->setTotal($newAmountValue);
+                $this->entityManager->flush();
+                $updatedCounter++;
+            }
+        }
+
+        return $updatedCounter;
     }
 }

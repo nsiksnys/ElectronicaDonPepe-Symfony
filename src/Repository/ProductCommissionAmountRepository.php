@@ -16,6 +16,11 @@ class ProductCommissionAmountRepository extends ServiceEntityRepository
         parent::__construct($registry, ProductCommissionAmount::class);
     }
 
+    public function getSelectDistinctQuery()
+    {
+        return $this->createQueryBuilder('p')->select(['IDENTITY(p.product)'])->distinct()->getQuery()->getSQL();
+    }
+
     //    /**
     //     * @return ProductCommissionAmount[] Returns an array of ProductCommissionAmount objects
     //     */

@@ -16,6 +16,8 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use App\BonusCalculations;
+use App\Entity\AwardAmount;
 
 #[Route('/amount')]
 class AmountController extends AbstractController
@@ -23,7 +25,7 @@ class AmountController extends AbstractController
     #[Route('/', name: 'app_amount_index', methods: ['GET'])]
     public function index(Request $request, EntityManagerInterface $entityManager, ProductRepository $productRepository, AwardAmountRepository $awardAmountRepository, ProductCommissionAmountRepository $productCommissionAmountRepository, SaleCommissionAmountRepository $saleCommissionAmountRepository): Response
     {
-        $availableProducts = $productRepository->findProductsInNoCommission();
+        $availableProducts = $productRepository->findProductsInNoCommission($productCommissionAmountRepository->getSelectDistinctQuery());
         $saleCommissions = $saleCommissionAmountRepository->findAll();
         $productCommissions = $productCommissionAmountRepository->findAll();
         $awards = $awardAmountRepository->findAll();
@@ -68,9 +70,6 @@ class AmountController extends AbstractController
             $newProductCommissionAmount->setProduct($product);
             $newProductCommissionAmount->setAmount($formData['amount']);
             
-            // Uncomment to check submitted data
-		    // dump($formData);
-
             // TODO: validate the amount value is not garbage
 
             //Save changes
@@ -86,7 +85,7 @@ class AmountController extends AbstractController
     }
 
     #[Route('/edit/{type}/{id}', name: 'app_amount_edit', methods: ['GET', 'POST'])]
-    public function edit(String $type, String $id, Request $request, EntityManagerInterface $entityManager, AwardAmountRepository $awardAmountRepository, ProductCommissionAmountRepository $productCommissionAmountRepository, SaleCommissionAmountRepository $saleCommissionAmountRepository): JsonResponse|Response
+    public function edit(String $type, String $id, Request $request, EntityManagerInterface $entityManager, AwardAmountRepository $awardAmountRepository, ProductCommissionAmountRepository $productCommissionAmountRepository, SaleCommissionAmountRepository $saleCommissionAmountRepository, BonusCalculations $bonusCalculations): JsonResponse|Response
     {
         $form = $this->createFormBuilder()
                 ->setAction($this->generateUrl('app_amount_edit', ['type' => $type, 'id' => $id]));
@@ -144,19 +143,19 @@ class AmountController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $formData = $form->getData();
-
-            // Uncomment to check submitted data
-		    // dump($formData);
+            $oldAmount = $amount->getValue();
+            $newAmount = $formData['amount'];
 
             // TODO: validate the amount value is not garbage
-
-            // TODO: What happens if we change the amounts but there are bonuses already created?
-            //       How do we recalculate the bonuses?
-
             //Save changes
             $amount->setAmount($formData['amount']);
             $entityManager->persist($amount);
             $entityManager->flush();
+
+            // TODO: What happens if we change the amounts but there are bonuses already created?
+            //       How do we recalculate the bonuses?
+            //$bonusCalculations->updateAllExistingBonus($newAmount, $oldAmount, $type, ($amount instanceof AwardAmount)? $amount->isCampaign() : null);
+
             return $this->redirectToRoute('app_amount_index', [], Response::HTTP_SEE_OTHER);
         }
 
