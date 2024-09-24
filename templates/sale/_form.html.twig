@@ -1,0 +1,12 @@
+{{ form_start(form) }}
+    <div class="mb-4">
+        {{ form_label(form.salesDate) }} {{ form_widget(form.salesDate) }}
+    </div>
+    <div class="mb-4">
+        {{ form_label(form.products) }} {{ form_widget(form.products) }}
+    </div>
+    <div class="mb-4">
+        {{ form_label(form.salesman) }} {{ form_widget(form.salesman) }}
+    </div>
+    {{ form_rest(form) }}
+{{ form_end(form) }}

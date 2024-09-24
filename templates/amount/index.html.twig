@@ -1,0 +1,228 @@
+{% extends "base.html.twig" %}
+
+{% block content %}
+	<h1>Adicionales existentes</h1>
+	<h2>Comision por venta</h2>
+	<table class="table">
+		<thead>
+			<tr>
+				<th scope="col">Id</th>
+				<th scope="col">Cantidad mínima</th>
+				<th scope="col">Cantidad máxima</th>
+				<th scope="col">Valor</th>
+				<th scope="col">Acciones</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for key, item in saleCommissions %}
+				<tr>
+					<td>{{ item.id }}</td>
+					<td>{{ item.min }}</td>
+					<td>{{ item.max }}</td>
+					<td>{{item.amount}}</td>
+					<td>
+						<!-- <a class="btn btn-primary" href="{{ url('app_amount_edit', {type: 'sale', id: item.id}) }}">Modificar</a> -->
+						<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#amountEditModal" data-bs-type="sale" data-bs-amount-id="{{ item.id }}">Modificar</button>
+					</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+
+	<br/><br/>
+	<h2>Comisión por producto</h2>
+	<table class="table">
+		<thead>
+			<tr>
+				<th scope="col">Id</th>
+				<th scope="col">Producto (Id - Nombre)</th>
+				<th scope="col">Valor</th>
+				<th scope="col">Acciones</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for item in productCommissions %}
+				<tr>
+					<td>{{ item.id }}</td>
+					<td>{{item.product.id}} - {{item.product.name}}</td>
+					<td>{{item.amount}}</td>
+					<td>
+						<!-- <a class="btn btn-primary" href="{{ url('app_amount_edit', {type: 'product', id: item.id}) }}">Modificar</a> -->
+						<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#amountEditModal" data-bs-type="product" data-bs-amount-id="{{ item.id }}">Modificar</button>
+					</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+
+	<!-- <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#productsModal">Agregar producto</button> -->
+	<!-- Accordion -->
+	<div class="accordion" id="productsAccordion">
+		<div class="accordion-item">
+			<h2 class="accordion-header" id="headingOne">
+				<button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+					Agregar productos
+				</button>
+			</h2>
+			<div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#productsAccordion">
+				<div class="accordion-body">
+					<table class="table">
+						<thead>
+							<tr>
+								<th scope="col">Nro</th>
+								<th scope="col">Nombre</th>
+								<th scope="col">Acciones</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for product in products %}
+								<tr>
+									<td>{{ product.id }}</td>
+									<td>{{ product.name }}</td>
+									<td>
+										<form>
+											<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#productsModal" data-bs-product-id="{{ product.id }}">Modificar</button>
+										</form>
+									</td>
+								</tr>
+							{% else %}
+								<tr>
+									<td colspan="3">Lista vacía</td>
+								</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- Accordion end -->
+	<br/><br/>
+	<h2>Premios</h2>
+	<table class="table">
+		<thead>
+			<tr>
+				<th scope="col">Tipo</th>
+				<th scope="col">Valor</th>
+				<th scope="col">Acciones</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for item in awards %}
+				<tr>
+					{% if item.campaign %}
+						<td>Campaña</td>
+					{% else %}
+						<td>Mejor vendedor mes</td>
+					{% endif %}
+					<td>{{ item.amount }}</td>
+					<td>
+						<!-- <a class="btn btn-primary" href="{{ url('app_amount_edit', {type: 'award', id: item.id}) }}">Modificar</a> -->
+						<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#amountEditModal" data-bs-type="award" data-bs-amount-id="{{ item.id }}">Modificar</button>
+					</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+
+	<!-- Modal -->
+	<div class="modal fade" id="productsModal" tabindex="-1" aria-labelledby="productsModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3 class="modal-title">Crear monto comisión producto</h3>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<!-- modal content is loaded via ajax here -->
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- Modal end -->
+	<!-- Modal used to edit amounts -->
+	<div class="modal fade" id="amountEditModal" tabindex="-1" aria-labelledby="amountEditModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3 class="modal-title" id="amountEditModalLabel">Editando monto</h3>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<!-- modal content is loaded via ajax here -->
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- Modal end -->
+	<script type="application/javascript">
+		// Create new ProductCommissionAmount
+		var productCommissionModal = document.getElementById('productsModal');
+		productCommissionModal.addEventListener('show.bs.modal', function (event) {
+			var button = event.relatedTarget;
+			var productId = button.getAttribute('data-bs-product-id');
+			var url = "{{ url('app_amount_add_product', { id: 'id' }) }}".replace('id', productId);
+
+			// Ajax call to get form
+			var request = new XMLHttpRequest();
+			request.open("GET", url);
+			request.send();
+			request.onreadystatechange = function() {
+				if (request.readyState == XMLHttpRequest.DONE) {
+					// Check the status of the response
+					if (request.status == 200) {
+					// Access the data returned by the server
+					var data = JSON.parse(request.responseText);
+					productCommissionModal.querySelector('.modal-body').innerHTML = data.form;
+					// Do something with the data
+					} else {
+					// Handle error
+					console.log("Error ${error}");
+					}
+				}
+			};
+		});
+
+		productCommissionModal.addEventListener('hide.bs.modal', function (event) {
+			productCommissionModal.querySelector('.modal-body').innerHTML = "";
+		});
+		
+		// Edit existing amounts
+		var amountEditModal = document.getElementById('amountEditModal');
+		amountEditModal.addEventListener('show.bs.modal', function (event) {
+			// Button that triggered the modal
+			var button = event.relatedTarget;
+			// Extract info from data-bs-* attributes
+			var amountType = button.getAttribute('data-bs-type');
+			var amountItemId = button.getAttribute('data-bs-amount-id');
+			var url = "{{ url('app_amount_edit', {type: 'type', id: 'id'}) }}".replace('type',amountType).replace('id',amountItemId);
+			
+			// Ajax call to get form
+			var request = new XMLHttpRequest();
+			request.open("GET", url);
+			request.send();
+			request.onreadystatechange = function() {
+				if (request.readyState == XMLHttpRequest.DONE) {
+					// Check the status of the response
+					if (request.status == 200) {
+					// Access the data returned by the server
+					var data = JSON.parse(request.responseText);
+					amountEditModal.querySelector('.modal-body').innerHTML = data.form;
+					// Do something with the data
+					} else {
+					// Handle error
+					console.log("Error ${error}");
+					}
+				}
+			};
+
+			// Update modal title
+			amountEditModal.querySelector('.modal-title').innerHTML = 'Editando monto ' + amountType + ' ' + amountItemId;
+		});
+
+		amountEditModal.addEventListener('hide.bs.modal', function (event) {
+			amountEditModal.querySelector('.modal-body').innerHTML = "";
+			amountEditModal.querySelector('.modal-title').innerHTML = "";
+		});
+	</script>
+{% endblock %}
