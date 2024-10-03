@@ -8,61 +8,37 @@ use App\Entity\Salesman;
 use App\Repository\SaleRepository;
 use App\Repository\ProductRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
-use Symfony\Component\Form\Extension\Core\Type\DateType;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/sale')]
 class SaleController extends AbstractController
 {
 
-    #[Route('/', name: 'app_sale_index', methods: ['GET','POST'])]
-    public function index(Request $request, SaleRepository $saleRepository): Response
+    #[Route('/', name: 'app_sale_index', methods: ['GET'])]
+    public function index(Request $request, SaleRepository $saleRepository): JsonResponse
     {
-        $sales = $saleRepository->findAll();
+        $sales = [];
+        $from = $request->query->get('from', "");
+        $to = $request->query->get('to', "");
 
-        $form = $this->createFormBuilder()
-                     ->add('date_from', DateType::class, [
-                        'label' => 'Desde',
-                        'widget' => 'single_text',
-                        'input' => 'string',
-                        'label_attr' => [ 'class' => 'form-label'],
-                        'attr' => [ 'class' => 'form-control']
-                     ])
-                     ->add('date_to', DateType::class, [
-                        'label' => 'Hasta',
-                        'widget' => 'single_text',
-                        'input' => 'string',
-                        'label_attr' => [ 'class' => 'form-label'],
-                        'attr' => [ 'class' => 'form-control']
-                     ])
-                     ->add('search', SubmitType::class, [
-                        'label' => 'Buscar', 
-                        'attr' => [ 'class' => 'btn btn-primary']
-                     ])
-                     ->getForm();
-        
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $formData = $form->getData();
-            $sales = $saleRepository->findByDates($formData['date_from'], $formData['date_to']);
+        // If there is no search by date, return all sale records
+        if ((!isset($from) || $from == "") && (!isset($to) || $to == "")) {
+            $sales = $saleRepository->findAll();
         }
-        return $this->render('sale/index.html.twig', [
-            'form' => $form,
-            'sales' => $sales
-        ]);
+        else {
+            $sales = $saleRepository->findByDates($from, $to);
+        }
+        
+        return $this->json($sales);
     }
-
-    #[Route('/new', name: 'app_sale_new', methods: ['GET', 'POST'])]
+/* 
+    #[Route('/new', name: 'app_sale_new', methods: ['POST'])]
     public function newGet(Request $request, EntityManagerInterface $entityManager, ProductRepository $productRepository): Response
     {
-        $sale = new Sale();
+        $sale = new Sale();        
         //$form = $this->createForm(SaleType::class, $sale);
         $form = $this->createFormBuilder($sale)
                      ->add('salesDate', DateTimeType::class, [
@@ -104,19 +80,17 @@ class SaleController extends AbstractController
 
             return $this->redirectToRoute('app_sale_index', [], Response::HTTP_SEE_OTHER);
         }
-
+ 
         return $this->render('sale/new.html.twig', [
             'sale' => $sale,
             'form' => $form
         ]);
     }
-
+*/
     #[Route('/{id}', name: 'app_sale_show', methods: ['GET'])]
     public function show(Sale $sale): JsonResponse
     {
-        return $this->json(['html' => $this->render('sale/show.html.twig', [
-            'sale' => $sale,
-        ])->getContent()]);
+        return $this->json($sale);
     }
 
     private function calculateTotal(Sale $sale): float
