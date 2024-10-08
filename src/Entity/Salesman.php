@@ -4,7 +4,6 @@ namespace App\Entity;
 
 use App\Repository\SalesmanRepository;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Annotation\Ignore;
 
 #[ORM\Entity(repositoryClass: SalesmanRepository::class)]
 class Salesman
@@ -15,15 +14,12 @@ class Salesman
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Ignore]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
-    #[Ignore]
     private ?string $lastname = null;
 
     #[ORM\Column]
-    #[Ignore]
     private ?bool $active = null;
 
     public function getId(): ?int
