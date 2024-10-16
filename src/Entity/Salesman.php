@@ -2,15 +2,24 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use App\Repository\SalesmanRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: SalesmanRepository::class)]
+#[ApiResource(
+    operations: [ new Get(), new GetCollection() ],
+    normalizationContext: ['groups' => ['salesman_read']]
+)]
 class Salesman
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['salesman_read','sale_read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
@@ -18,6 +27,9 @@ class Salesman
 
     #[ORM\Column(length: 255)]
     private ?string $lastname = null;
+
+    #[Groups(['salesman_read','sale_read'])]
+    private ?string $fullName = "";
 
     #[ORM\Column]
     private ?bool $active = null;
