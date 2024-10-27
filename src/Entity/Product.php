@@ -18,7 +18,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
     operations: [ new Get(), new GetCollection() ],
     normalizationContext: ['groups' => ['product_read']]
 )]
-#[ApiFilter(ExistsFilter::class, properties: ['campaigns'])]
+#[ApiFilter(ExistsFilter::class, properties: ['campaigns', 'commissionAmount'])]
 #[Groups('product_read')]
 class Product
 {
@@ -38,6 +38,9 @@ class Product
 
     #[ORM\OneToMany(targetEntity: Campaign::class, mappedBy: 'product')]
     private Collection $campaigns;
+
+    #[ORM\OneToOne(cascade: ['persist', 'remove'], mappedBy: 'product')]
+    private ProductCommissionAmount $commissionAmount;
 
     public function __construct()
     {
@@ -79,5 +82,10 @@ class Product
     public function getCampaigns(): Collection
     {
         return $this->campaigns;
+    }
+
+    public function getCommissionAmount(): ProductCommissionAmount
+    {
+        return $this->commissionAmount;
     }
 }
