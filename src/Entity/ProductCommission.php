@@ -4,8 +4,10 @@ namespace App\Entity;
 
 use App\Repository\ProductCommissionRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: ProductCommissionRepository::class)]
+#[Groups('bonus_read')]
 class ProductCommission extends Commission
 {
     #[ORM\ManyToOne]

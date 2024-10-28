@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\CommissionRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity]
 #[ORM\InheritanceType('SINGLE_TABLE')]
@@ -15,15 +16,19 @@ abstract class Commission
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups('bonus_read')]
     private ?int $id = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Groups('bonus_read')]
     private ?\DateTimeInterface $createdAt = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Groups('bonus_read')]
     private ?\DateTimeInterface $fromDate = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Groups('bonus_read')]
     private ?\DateTimeInterface $toDate = null;
 
     #[ORM\ManyToOne]
@@ -31,9 +36,11 @@ abstract class Commission
     private ?Salesman $salesman = null;
 
     #[ORM\Column(nullable: false)]
+    #[Groups('bonus_read')]
     private ?int $units = 0;
 
     #[ORM\Column]
+    #[Groups('bonus_read')]
     private ?float $total = 0;
 
     public function getId(): ?int

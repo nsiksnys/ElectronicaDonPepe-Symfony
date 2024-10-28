@@ -2,58 +2,81 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use App\Controller\BonusController;
 use App\Repository\BonusRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: BonusRepository::class)]
+#[ApiResource(
+    operations: [ new Get(), new GetCollection(), new GetCollection() ],
+    normalizationContext: ['groups' => ['bonus_read']],
+    denormalizationContext: ['groups' => ['bonus_write']],
+)]
 class Bonus
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups('bonus_read')]
     private ?int $id = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Groups('bonus_read')]
     private ?\DateTimeInterface $createdAt = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Groups('bonus_read')]
     private ?\DateTimeInterface $dateFrom = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Groups('bonus_read')]
     private ?\DateTimeInterface $dateTo = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups('bonus_read')]
     private ?Salesman $salesman = null;
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    #[Groups('bonus_read')]
     private ?SaleCommission $saleComission = null;
 
     /**
      * @var Collection<int, ProductCommission>
      */
     #[ORM\ManyToMany(targetEntity: ProductCommission::class, cascade: ['persist', 'remove'])]
+    #[Groups('bonus_read')]
     private Collection $ProductComissions;
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    #[Groups('bonus_read')]
     private ?Award $bestSalesmanMonth = null;
 
     /**
      * @var Collection<int, Award>
      */
     #[ORM\ManyToMany(targetEntity: Award::class, cascade: ['persist', 'remove'])]
+    #[Groups('bonus_read')]
     private Collection $campaigns;
 
     #[ORM\Column(nullable: true)]
+    #[Groups('bonus_read')]
     private ?float $productCommissionsTotal = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups('bonus_read')]
     private ?float $campaignAwardsTotal = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups('bonus_read')]
     private ?float $total = null;
 
     public function __construct()

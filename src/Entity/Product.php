@@ -19,7 +19,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
     normalizationContext: ['groups' => ['product_read']]
 )]
 #[ApiFilter(ExistsFilter::class, properties: ['campaigns', 'commissionAmount'])]
-#[Groups('product_read')]
+#[Groups(['product_read', 'bonus_read'])]
 class Product
 {
     #[ORM\Id]

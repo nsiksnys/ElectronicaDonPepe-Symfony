@@ -19,7 +19,7 @@ class Salesman
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['salesman_read','sale_read'])]
+    #[Groups(['salesman_read','sale_read','bonus_read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
@@ -28,7 +28,7 @@ class Salesman
     #[ORM\Column(length: 255)]
     private ?string $lastname = null;
 
-    #[Groups(['salesman_read','sale_read'])]
+    #[Groups(['salesman_read','sale_read','bonus_read'])]
     private ?string $fullName = "";
 
     #[ORM\Column]
