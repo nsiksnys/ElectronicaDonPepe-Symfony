@@ -16,7 +16,13 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: BonusRepository::class)]
 #[ApiResource(
-    operations: [ new Get(), new GetCollection(), new GetCollection() ],
+    operations: [ new Get(), new GetCollection(), new GetCollection(
+        name: 'calculate_bonus',
+        uriTemplate: '/bonus/calculate',
+        controller: BonusController::class,
+        normalizationContext: [
+            'groups' => ['bonus_read'],
+        ]) ],
     normalizationContext: ['groups' => ['bonus_read']],
     denormalizationContext: ['groups' => ['bonus_write']],
 )]

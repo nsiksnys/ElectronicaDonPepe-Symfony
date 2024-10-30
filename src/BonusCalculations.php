@@ -62,7 +62,7 @@ class BonusCalculations
         $this->salesmanRepository = $this->entityManager->getRepository(Salesman::class);
     }
 
-    public function calculateAll(string $from, array $salespeople): array
+    public function calculateAll(string $from, array $salespeopleIds): array
     {
         $bonuses = [];
         $from = new DateTime($from);
@@ -70,22 +70,21 @@ class BonusCalculations
         $to = clone $from;
         $to->modify('last day of this month')->setTime(23,59,59);
 
+        // Get the Salesman objects
+        $salespeople = $this->salesmanRepository->findBy(['id' => $salespeopleIds]);
+
+        // No sales found
         if ($this->saleRepository->countByDates($this->getStringDate($from), $this->getStringDate($to)) == 0){
-            throw new \Exception("No hay ventas para éste período.");
+            return [];
         }
 
-        try{
-            // Calculate awards
-            $bestSalesmanAward = $this->calculateBestSalesmanAward($from, $to, $salespeople);
-            $campaignAwards = $this->calculateAllCampaignAwards($from, $to, $salespeople);
+        // Calculate awards
+        $bestSalesmanAward = $this->calculateBestSalesmanAward($from, $to, $salespeople);
+        $campaignAwards = $this->calculateAllCampaignAwards($from, $to, $salespeople);
 
-            // Calcualte bonuses for each salesman
-            foreach ($salespeople as $salesman) {
-                $bonuses[] = $this->calculateBonus($from, $to, $salesman, $bestSalesmanAward, $campaignAwards);
-            }
-        }
-        catch(\Exception $e){
-            throw new \Exception("Algo salió mal. Por favor intente nuevamente.");
+        // Calcualte bonuses for each salesman
+        foreach ($salespeople as $salesman) {
+            $bonuses[] = $this->calculateBonus($from, $to, $salesman, $bestSalesmanAward, $campaignAwards);
         }
         
         return $bonuses;
@@ -121,8 +120,8 @@ class BonusCalculations
         $bonus->setBestSalesmanMonth($thisBestSalesman);
         $this->setTotals($bonus);
 
-        // $this->entityManager->persist($bonus);
-        // $this->entityManager->flush();
+        $this->entityManager->persist($bonus);
+        $this->entityManager->flush();
 
         return $bonus;
     }
