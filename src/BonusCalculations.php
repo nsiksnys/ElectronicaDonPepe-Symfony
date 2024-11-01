@@ -78,6 +78,12 @@ class BonusCalculations
             return [];
         }
 
+        // Search for already calculated bonuses
+        $bonuses = $this->bonusRepository->findByDatesAndSalespeople($this->getStringDate($from), $this->getStringDate($to), $salespeopleIds);
+        if (count($bonuses) > 0) {
+            return $bonuses;
+        }
+        
         // Calculate awards
         $bestSalesmanAward = $this->calculateBestSalesmanAward($from, $to, $salespeople);
         $campaignAwards = $this->calculateAllCampaignAwards($from, $to, $salespeople);

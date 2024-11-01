@@ -16,6 +16,24 @@ class BonusRepository extends ServiceEntityRepository
         parent::__construct($registry, Bonus::class);
     }
 
+    /**
+     * @param string $from the beginning of the search window
+     * @param string $to the end of the search window
+     * @param array $salespeople an array of Salesman ids
+     * @return Bonus[] an array of Bonus objects
+     */
+    public function findByDatesAndSalespeople(string $from, string $to, array $salespeople) : array
+    {
+        return $this->createQueryBuilder('b')
+                    ->where(['b.dateFrom = :from', 'b.dateTo = :to'])
+                    ->andWhere('IDENTITY(b.salesman) IN (:salespeople)')
+                    ->setParameter('from', $from)
+                    ->setParameter('to', $to)
+                    ->setParameter('salespeople', $salespeople)
+                    ->getQuery()
+                    ->getResult();
+    }
+
     //    /**
     //     * @return Bonus[] Returns an array of Bonus objects
     //     */
