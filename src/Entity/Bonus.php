@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
@@ -60,7 +59,7 @@ class Bonus
      */
     #[ORM\ManyToMany(targetEntity: ProductCommission::class, cascade: ['persist', 'remove'])]
     #[Groups('bonus_read')]
-    private Collection $ProductComissions;
+    private Collection $productComissions;
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     #[Groups('bonus_read')]
@@ -87,7 +86,7 @@ class Bonus
 
     public function __construct()
     {
-        $this->ProductComissions = new ArrayCollection();
+        $this->productComissions = new ArrayCollection();
         $this->campaigns = new ArrayCollection();
     }
 
@@ -161,13 +160,13 @@ class Bonus
      */
     public function getProductComissions(): Collection
     {
-        return $this->ProductComissions;
+        return $this->productComissions;
     }
 
     public function addProductComission(ProductCommission $productComission): static
     {
-        if (!$this->ProductComissions->contains($productComission)) {
-            $this->ProductComissions->add($productComission);
+        if (!$this->productComissions->contains($productComission)) {
+            $this->productComissions->add($productComission);
         }
 
         return $this;
@@ -175,7 +174,7 @@ class Bonus
 
     public function removeProductComission(ProductCommission $productComission): static
     {
-        $this->ProductComissions->removeElement($productComission);
+        $this->productComissions->removeElement($productComission);
 
         return $this;
     }
